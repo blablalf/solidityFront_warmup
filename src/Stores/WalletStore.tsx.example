@@ -1,10 +1,3 @@
 import {useState, useEffect} from 'react';
-import Web3 from 'web3'; 
 
-function App() {
-    let provider;
-    const web3 = new Web3(Web3.givenProvider || "ws://localhost:8545");
-}
-
-export default App;
 //const web3 = new Web3(new Web3.providers.SepoliaProvider('myAppName'));   // Connect to the Sepolia blockchain    const myContract = new web3.eth.Contract(contractAbi, contractAddress);     // Interact with the smart contract now!
