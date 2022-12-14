@@ -13,23 +13,11 @@ type TargetedChainInfo = {
     rpcUrl: string
 }
 
-type UserInfo = {
-    address: string
-}
-
 export default class WalletStore {
 	private static ctx: WalletStore;
     private static provider: ethers.providers.Web3Provider;
     private static currentChainInfos: CurrentChainInfos;
     private static targetedChainInfo: TargetedChainInfo;
-    private static userInfo: UserInfo;
-    
-    public static getUserInfo(): UserInfo {
-        return WalletStore.userInfo;
-    }
-    public static setUserInfo(value: UserInfo) {
-        WalletStore.userInfo = value;
-    }
 
     public static getInstance(): WalletStore {
 		if (!WalletStore.ctx) new this();
@@ -48,9 +36,6 @@ export default class WalletStore {
             chainId: 0,
             name: '',
             rpcUrl: ''
-        }
-        WalletStore.userInfo = {
-            address: ''
         }
     }
 
@@ -86,7 +71,7 @@ export default class WalletStore {
     public static connect() {
         return window.ethereum.enable().then(async () => {  // Requires the User to give permission to access their MetaMask portfolio information.
             // Create an instance of the Web3 provider with the EVM browser API and set the store property with the correct value
-            this.provider = new ethers.providers.Web3Provider(window.ethereum, { name: this.targetedChainInfo.name, chainId: this.targetedChainInfo.chainId, ensAddress: this.targetedChainInfo.rpcUrl })
+            this.provider = new ethers.providers.Web3Provider(window.ethereum)
         });
     }
 
