@@ -35,26 +35,30 @@ class ChainInfo extends React.Component<IProps, IState> {
 
             // We says that the targeted chain is Sepolia
             WalletStore.setTargetedChainInfo({ chainId: 11155111, name: 'Sepolia', rpcUrl: 'https://rpc.sepolia.dev' });
-            this.updateChainInfo();
+            if (WalletStore.getCurrentChainInfos().chainId !== 11155111) this.updateChainInfo();
         });
     }
 
-    public updateChainInfo() {
+    public async updateChainInfo() {
         // Init the data collect
-        WalletStore.updateChainInfo().then(() => this.setState({
-            chainName: this.state.chainName,
-            chainId: this.state.chainId,
-            lastBlockNumber: this.state.lastBlockNumber,
-            goodChain: WalletStore.getCurrentChainInfos().goodChain
-        }))
-    }
-
-    public changeNetwork() {
-        WalletStore.changeToTargetedChain().then(() => // Ask to the user to change his network
-            this.updateChainInfo()
+        return WalletStore.updateChainInfo().then(() =>
+            this.setState({
+                chainName: WalletStore.getCurrentChainInfos().chainName,
+                chainId: WalletStore.getCurrentChainInfos().chainId,
+                lastBlockNumber: WalletStore.getCurrentChainInfos().lastBlockNumber,
+                goodChain: WalletStore.getCurrentChainInfos().goodChain
+            })
         );
     }
 
+    public async changeNetwork() {
+        console.log("this_", this);
+        WalletStore.changeToTargetedChain().then(() => // Ask to the user to change his network
+     {
+            return this.updateChainInfo()}
+        );
+    }
+ 
     componentDidUpdate(prevProps: Readonly<IProps>, prevState: Readonly<IState>, snapshot?: any): void {
         this.updateChainInfo();
     }
@@ -71,7 +75,7 @@ class ChainInfo extends React.Component<IProps, IState> {
                 { !this.state.goodChain ?
                     <div>
                         <p>Bad Network</p>
-                        <button onClick={this.changeNetwork}>Change Network</button>
+                        <button onClick={() => this.changeNetwork()}>Change Network</button>
                     </div>
                 : null }
                 

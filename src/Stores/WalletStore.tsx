@@ -71,7 +71,21 @@ export default class WalletStore {
     public static connect() {
         return window.ethereum.enable().then(async () => {  // Requires the User to give permission to access their MetaMask portfolio information.
             // Create an instance of the Web3 provider with the EVM browser API and set the store property with the correct value
-            this.provider = new ethers.providers.Web3Provider(window.ethereum)
+            this.provider = new ethers.providers.Web3Provider(window.ethereum);
+
+            // Handle network changes
+            this.provider.on("network", (_newNetwork, oldNetwork) => {
+                // When a Provider makes its initial connection, it emits a "network"
+                // event with a null oldNetwork along with the newNetwork. So, if the
+                // oldNetwork exists, it represents a changing network
+                if (oldNetwork) {
+                    window.location.reload();
+                }
+            });
+            window.ethereum.on('changed', (network: any) => {
+                console.log(`Le réseau a changé pour le réseau ID ${network}.`);
+                this.provider = new ethers.providers.Web3Provider(window.ethereum);
+            });
         });
     }
 
@@ -82,18 +96,20 @@ export default class WalletStore {
         });
     }
 
-    public static updateChainInfo() {
+    public static async updateChainInfo() {
+
         return this.provider.getNetwork().then((network) => {
             this.currentChainInfos.chainName = network.name;
             this.currentChainInfos.goodChain = network.chainId === this.targetedChainInfo.chainId ? true : false;
             this.currentChainInfos.chainId = network.chainId;
-
+            
             // Get block number
             if (this.currentChainInfos.goodChain)
                 this.provider.getBlockNumber().then((blockNumber) => {
                     this.currentChainInfos.lastBlockNumber = blockNumber;
                 });
             else this.currentChainInfos.lastBlockNumber = 0
+            
         });
     }
 
